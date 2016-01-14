@@ -282,6 +282,7 @@ module CardDeck
       include MyOtherCustomModule
     end
   end
+  View.extend Unloadable
 
   class ApplicationLayout
     include CardDeck::Layout
@@ -297,6 +298,11 @@ module CardDeck
     end
 
     module Home
+      class Edit
+        include CardDeck::View
+        template 'home/edit'
+      end
+
       class Index
         include CardDeck::View
       end
@@ -345,7 +351,9 @@ class ViewForScopeTest
 end
 
 module Store
-  View = Lotus::View.duplicate(self)
+  View = Lotus::View.duplicate(self) do
+    root __dir__ + '/fixtures/templates/store/templates'
+  end
   View.extend Unloadable
 
   module Helpers
@@ -373,7 +381,7 @@ module Store
     module Home
       class Index
         include Store::View
-        template 'store/templates/home/index'
+        template 'home/index'
         layout :store
       end
 
@@ -390,6 +398,16 @@ module Store
         def footer
           _raw %(<script src="/javascripts/product-tracking.js"></script>)
         end
+      end
+
+      # This view maps to a template that tries to include a partial from the CardDeck app
+      class Edit
+        include Store::View
+      end
+
+      # This view maps to a template that includes a partial from this app
+      class Index
+        include Store::View
       end
     end
   end
